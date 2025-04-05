@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('clone GIT repo') {
+            steps {
+                echo 'cloning from code from GIT repo'
+				git branch: 'main', url: 'https://github.com/Sumanrathods/mindcircuit15d.git'
+            }
+        }
+		
+		
+        stage('build artifact') {
+            steps {
+                echo 'bualing artifact using maven build'
+				sh 'mvn clean install'
+            }
+        }
+		
+        stage('deploye to tomcat') {
+            steps {
+                echo 'deploying the artifact on the tomcat'
+				deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://ec2-3-208-12-70.compute-1.amazonaws.com:8080')], contextPath: 'sumanfacebook', war: '**/*.war'
+            }
+        }
+	}	
+}
